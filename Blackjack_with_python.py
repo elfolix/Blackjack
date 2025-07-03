@@ -1,23 +1,23 @@
 import random
 
-# Símbolos reales de los palos
-symbol = {"Hearts": "♥", "Diamonds": "♦", "Clubs": "♣", "Spades": "♠"}
+# Symbols for suits
+suit_symbols = {"Hearts": "♥", "Diamonds": "♦", "Clubs": "♣", "Spades": "♠"}
 
 
-# Dibuja una carta en formato de texto
-def dibujar_carta(card):
+# Draw a card in text format
+def draw_card(card):
     rank = card.rank
-    suit_symbol = symbol.get(card.suit, "?")
+    symbol = suit_symbols.get(card.suit, "?")
     top = "┌─────────┐"
     middle = f"│ {rank:<2}      │"
-    center = f"│    {suit_symbol}    │"
+    center = f"│    {symbol}    │"
     bottom = f"│      {rank:>2} │"
     end = "└─────────┘"
     return [top, middle, "│         │", center, "│         │", bottom, end]
 
 
-# Dibujo de una carta oculta
-def carta_oculta():
+# Draw a hidden card
+def hidden_card():
     return [
         "┌─────────┐",
         "│░░░░░░░░░│",
@@ -100,25 +100,24 @@ class Player:
             self.hand.add_card(card)
 
     def show_hand(self, show_all=True):
-        print(f"\n{self.name} Have:")
+        print(f"\n{self.name} has:")
         if not show_all:
-            cartas = [self.hand.cards[0]] + [None] * (len(self.hand.cards) - 1)
+            cards_to_show = [self.hand.cards[0]] + [None] * (len(self.hand.cards) - 1)
         else:
-            cartas = self.hand.cards
+            cards_to_show = self.hand.cards
 
-        lineas_cartas = []
-        for card in cartas:
+        card_lines = []
+        for card in cards_to_show:
             if card is None:
-                card_lines = carta_oculta()
+                card_lines.append(hidden_card())
             else:
-                card_lines = dibujar_carta(card)
-            lineas_cartas.append(card_lines)
+                card_lines.append(draw_card(card))
 
         for i in range(7):
-            print("  ".join(carta[i] for carta in lineas_cartas))
+            print("  ".join(card[i] for card in card_lines))
 
         if show_all:
-            print(f"(Valor: {self.hand.value})")
+            print(f"(Value: {self.hand.value})")
 
 
 class BlackjackGame:
@@ -129,7 +128,7 @@ class BlackjackGame:
         self.dealer = Player("Dealer")
 
     def start_game(self):
-        # Reparte 2 cartas a cada uno
+        # Deal 2 cards to each
         for _ in range(2):
             self.player.draw(self.deck)
             self.dealer.draw(self.deck)
@@ -137,9 +136,9 @@ class BlackjackGame:
         self.player.show_hand()
         self.dealer.show_hand(show_all=False)
 
-        # Turno del jugador
+        # Player's turn
         while self.player.hand.value < 21:
-            decision = input("¿Do you want to hit or stand? (h/s): ").lower()
+            decision = input("Do you want to hit or stand? (h/s): ").lower()
             if decision == "h":
                 self.player.draw(self.deck)
                 self.player.show_hand()
@@ -148,7 +147,7 @@ class BlackjackGame:
             else:
                 print("Please, only write 'h' or 's'.")
 
-        # Turno del crupier
+        # Dealer's turn
         while self.dealer.hand.value < 17:
             self.dealer.draw(self.deck)
 
@@ -161,11 +160,11 @@ class BlackjackGame:
 
         print()
         if player_val > 21:
-            print("You bust. ¡You lose!")
+            print("You bust. You lose!")
         elif dealer_val > 21 or player_val > dealer_val:
-            print("¡You win!")
+            print("You win!")
         elif player_val == dealer_val:
-            print("Is a push.")
+            print("Push (tie).")
         else:
             print("Dealer wins.")
 
@@ -178,9 +177,9 @@ if __name__ == "__main__":
         while True:
             decision = input("Do you want to play again? (y/n): ").lower()
             if decision == "y":
-                break  # Sale del bucle interno y reinicia el juego
+                break
             elif decision == "n":
                 print("Thanks for playing!")
-                exit()  # Termina el programa
+                exit()
             else:
                 print("Please, only write 'y' or 'n'.")
